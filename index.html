@@ -16,7 +16,6 @@
       padding: 16px 12px;
     }
 
-    /* 頂部英里留學橫幅 */
     .brand-header {
       width: 100%;
       max-width: 420px;
@@ -221,7 +220,7 @@
     .btn:hover { background: #f8fafc; }
     .btn-shuffle { flex: 0 0 50px; font-size: 1.1rem; }
 
-    /* 2. 測驗模式 (完全無漢字) */
+    /* 2. 測驗模式 (進行中) */
     .quiz-card {
       width: 100%;
       background: #ffffff;
@@ -589,7 +588,7 @@
   </div>
 
   <script>
-    // 專屬對應您 GitHub 倉庫中最外層的 22 張真實圖片名稱！
+    // 100% 精準對應您現在 GitHub 上的 22 個真實檔案名稱！
     var data = [
       { id: 1, pinyin: "chī fàn", word: "吃飯", file: "PPT_01_吃飯.png", meaning: "ご飯を食べる", example: "例句：我吃飯。" },
       { id: 2, pinyin: "kàn shū", word: "看書", file: "PPT_02_看書.png", meaning: "本を読む", example: "例句：他看書。" },
@@ -603,16 +602,16 @@
       { id: 10, pinyin: "xiū xi", word: "休息", file: "PPT_10_休息.png", meaning: "休む", example: "例句：我要休息。" },
       { id: 11, pinyin: "mǎi dōng xi", word: "買東西", file: "PPT_11_買東西.png", meaning: "買い物をする", example: "例句：去買東西。" },
       { id: 12, pinyin: "chāo shì", word: "超市", file: "PPT_12_超市.png", meaning: "スーパー", example: "例句：我去超市。" },
-      { id: 13, pinyin: "zǎo ān", word: "早安", file: "PPT_13_早安.png", meaning: "おはよう", example: "例句：老師，早安！" },
-      { id: 14, pinyin: "yú", word: "魚", file: "PPT_14_魚.png", meaning: "魚", example: "例句：我吃魚。" },
-      { id: 15, pinyin: "péng you", word: "朋友", file: "PPT_15_朋友.png", meaning: "友達", example: "例句：他是我的朋友。" },
-      { id: 16, pinyin: "zhū", word: "豬", file: "PPT_16_豬.png", meaning: "豚", example: "例句：那是豬。" },
-      { id: 17, pinyin: "píng guǒ", word: "蘋果", file: "PPT_17_蘋果.png", meaning: "りんご", example: "例句：我買蘋果。" },
-      { id: 18, pinyin: "zhōng wǔ", word: "中午", file: "PPT_18_中午.png", meaning: "昼、正午", example: "例句：中午吃飯。" },
-      { id: 19, pinyin: "zǎo shang", word: "早上", meaning: "朝", file: "PPT_19_早上.png", example: "例句：早上好。" },
-      { id: 20, pinyin: "jīn tiān", word: "今天", meaning: "今日", file: "PPT_20_今天.png", example: "例句：今天是週末。" },
-      { id: 21, pinyin: "míng tiān", word: "明天", meaning: "明日", file: "PPT_21_明天.png", example: "例句：明天去超市。" },
-      { id: 22, pinyin: "xià wǔ", word: "下午", meaning: "午後", file: "PPT_22_下午.png", example: "例句：下午看書。" }
+      { id: 13, pinyin: "zǎo ān", word: "早安", file: "插畫_01_早安.png", meaning: "おはよう", example: "例句：老師，早安！" },
+      { id: 14, pinyin: "yú", word: "魚", file: "插畫_02_魚.png", meaning: "魚", example: "例句：我吃魚。" },
+      { id: 15, pinyin: "péng you", word: "朋友", file: "插畫_03_朋友.png", meaning: "友達", example: "例句：他是我的朋友。" },
+      { id: 16, pinyin: "zhū", word: "豬", file: "插畫_04_豬.png", meaning: "豚", example: "例句：那是豬。" },
+      { id: 17, pinyin: "píng guǒ", word: "蘋果", file: "插畫_05_蘋果.png", meaning: "りんご", example: "例句：我買蘋果。" },
+      { id: 18, pinyin: "zhōng wǔ", word: "中午", file: "插畫_06_中午.png", meaning: "昼、正午", example: "例句：中午吃飯。" },
+      { id: 19, pinyin: "zǎo shang", word: "早上", file: "插畫_07_早上.png", meaning: "朝", example: "例句：早上好。" },
+      { id: 20, pinyin: "jīn tiān", word: "今天", file: "插畫_08_今天.png", meaning: "今日", example: "例句：今天是週末。" },
+      { id: 21, pinyin: "míng tiān", word: "明天", file: "插畫_09_明天.png", meaning: "明日", example: "例句：明天去超市。" },
+      { id: 22, pinyin: "xià wǔ", word: "下午", file: "插畫_10_下午.png", meaning: "午後", example: "例句：下午看書。" }
     ];
 
     var current = 0;
@@ -652,7 +651,6 @@
     function handleCardAudio(e) { if (e) e.stopPropagation(); playAudio(data[current].word); }
     function handleExampleAudio(e) { if (e) e.stopPropagation(); playAudio(data[current].example); }
 
-    // 直接抓取與 index.html 放在同目錄的 PPT_XX_單字.png
     function displayImage(item, imgElement) {
       imgElement.src = item.file;
     }
@@ -747,7 +745,7 @@
       else showResult();
     }
 
-    // 結算畫面（完全依截圖打造）
+    // 結算畫面
     function showResult() {
       stopCurrentAudio();
       document.getElementById("quiz-card").classList.add("hidden");
