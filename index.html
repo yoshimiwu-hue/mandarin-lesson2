@@ -16,6 +16,7 @@
       padding: 16px 12px;
     }
 
+    /* 頂部英里留學橫幅 */
     .brand-header {
       width: 100%;
       max-width: 420px;
@@ -70,6 +71,21 @@
     .tab-btn.active {
       background: #ffffff;
       color: #0f766e;
+    }
+
+    /* スマホ向けマナーモード注意アナウンス */
+    .mobile-audio-notice {
+      background: #fffbeb;
+      border: 1px solid #fef3c7;
+      color: #b45309;
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      font-weight: 600;
     }
 
     .view-section {
@@ -158,16 +174,18 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 24px;
+      padding: 10px 28px;
       background: #0f766e;
       color: #ffffff;
       border: none;
       border-radius: 50px;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(15,118,110,0.25);
     }
+    .audio-btn:active { transform: scale(0.96); }
+
     .back {
       background: #fffaf5;
       transform: rotateY(180deg);
@@ -220,7 +238,7 @@
     .btn:hover { background: #f8fafc; }
     .btn-shuffle { flex: 0 0 50px; font-size: 1.1rem; }
 
-    /* 2. 測驗模式 (進行中) */
+    /* 2. 測驗模式 (完全無漢字) */
     .quiz-card {
       width: 100%;
       background: #ffffff;
@@ -261,16 +279,19 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 20px;
-      background: #f0fdfa;
-      color: #0f766e;
-      border: 1.5px solid #99f6e4;
+      padding: 10px 24px;
+      background: #0f766e;
+      color: #ffffff;
+      border: none;
       border-radius: 50px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+      box-shadow: 0 3px 10px rgba(15,118,110,0.25);
     }
+    .quiz-audio-trigger:active { transform: scale(0.96); }
+
     .quiz-meaning {
       font-size: 1.25rem;
       font-weight: 800;
@@ -286,11 +307,11 @@
     }
     .option-btn {
       width: 100%;
-      padding: 13px 18px;
+      padding: 14px 18px;
       background: #f8fafc;
       border: 2px solid #cbd5e1;
       border-radius: 14px;
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       font-weight: 700;
       color: #1e293b;
       cursor: pointer;
@@ -481,7 +502,8 @@
 </head>
 <body>
 
-  <audio id="tts-audio-player" preload="none" referrerpolicy="no-referrer"></audio>
+  <!-- 音声再生プレイヤー -->
+  <audio id="tts-audio-player" preload="auto" playsinline></audio>
 
   <div class="brand-header">
     <div class="brand-badges">
@@ -492,6 +514,11 @@
       <button class="tab-btn active" id="tab-study-btn" onclick="switchTab('study')">🗂️ 単語カード</button>
       <button class="tab-btn" id="tab-quiz-btn" onclick="switchTab('quiz')">🎧 リスニング</button>
     </div>
+  </div>
+
+  <!-- マナーモード注意表示 -->
+  <div class="mobile-audio-notice">
+    📢 音が出ない場合：スマホの消音モード（マナーモード）を解除し、音量を上げてください。
   </div>
 
   <!-- 1. 字卡模式 -->
@@ -527,7 +554,7 @@
     </div>
   </div>
 
-  <!-- 2. 測驗模式 (進行中) -->
+  <!-- 2. 測驗模式 (完全無漢字) -->
   <div class="view-section hidden" id="quiz-view">
     <div class="quiz-card" id="quiz-card">
       <div class="quiz-header">
@@ -540,7 +567,7 @@
       </div>
 
       <button class="quiz-audio-trigger" onclick="playCurrentQuizAudio()">
-        🔊 播放發音
+        🔊 播放發音（タップして聴く）
       </button>
 
       <div class="quiz-meaning" id="quiz-prompt"></div>
@@ -548,7 +575,7 @@
       <button class="next-quiz-btn" id="next-quiz-btn" onclick="nextQuestion()">下一題 ➔</button>
     </div>
 
-    <!-- 3. 成績單畫面 (完全依截圖打造) -->
+    <!-- 3. 成績單畫面 -->
     <div class="view-section hidden" id="result-view">
       <div class="result-sheet-container">
         <div class="sheet-top">
@@ -588,7 +615,6 @@
   </div>
 
   <script>
-    // 100% 精準對應您現在 GitHub 上的 22 個真實檔案名稱！
     var data = [
       { id: 1, pinyin: "chī fàn", word: "吃飯", file: "PPT_01_吃飯.png", meaning: "ご飯を食べる", example: "例句：我吃飯。" },
       { id: 2, pinyin: "kàn shū", word: "看書", file: "PPT_02_看書.png", meaning: "本を読む", example: "例句：他看書。" },
@@ -622,24 +648,52 @@
     if (savedName) document.getElementById("student-name").value = savedName;
     function saveStudentName(val) { localStorage.setItem("eiri_student_name", val); }
 
-    // 真人自然發音（無機械音、防雙重疊音）
+    // ===== スマホ対応・安定音声エンジン =====
     function playAudio(text) {
       if (!text) return;
       var clean = text.replace(/例句：|。|！|？|,|\./g, '').trim();
       stopCurrentAudio();
-      var player = document.getElementById("tts-audio-player");
-      player.src = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-TW&q=" + encodeURIComponent(clean);
-      var p = player.play();
-      if (p !== undefined) {
-        p.catch(function() {
-          if (window.speechSynthesis) {
-            var utter = new SpeechSynthesisUtterance(clean);
-            utter.lang = "zh-TW";
-            utter.rate = 0.85;
-            window.speechSynthesis.speak(utter);
+
+      // 1. スマホ内蔵の標準台湾華語音声 (タップと同時に鳴らすことでブロックを回避)
+      var speechStarted = false;
+      if (window.speechSynthesis) {
+        try {
+          var utter = new SpeechSynthesisUtterance(clean);
+          utter.lang = "zh-TW";
+          utter.rate = 0.85;
+
+          // 最適な台湾音声を探す
+          var voices = window.speechSynthesis.getVoices();
+          for (var i = 0; i < voices.length; i++) {
+            var v = voices[i];
+            if (v.lang === "zh-TW" || v.lang.indexOf("TW") !== -1) {
+              utter.voice = v;
+              break;
+            }
           }
-        });
+
+          utter.onerror = function() { playAudioFallback(clean); };
+          window.speechSynthesis.speak(utter);
+          speechStarted = true;
+        } catch (e) {
+          speechStarted = false;
+        }
       }
+
+      // 2. 音声合成が無効な場合のフォールバック再生
+      if (!speechStarted) {
+        playAudioFallback(clean);
+      }
+    }
+
+    function playAudioFallback(cleanText) {
+      try {
+        var player = document.getElementById("tts-audio-player");
+        player.src = "https://dict.youdao.com/dictvoice?audio=" + encodeURIComponent(cleanText) + "&le=zh";
+        player.play().catch(function(e) {
+          console.log("Audio play error:", e);
+        });
+      } catch (err) {}
     }
 
     function stopCurrentAudio() {
@@ -697,7 +751,6 @@
       displayImage(q, document.getElementById("quiz-img"));
       document.getElementById("quiz-prompt").textContent = q.meaning;
       document.getElementById("next-quiz-btn").style.display = "none";
-      playAudio(q.word);
 
       var distractors = data.filter(function(d) { return d.id !== q.id; })
                             .sort(function() { return Math.random() - 0.5; })
@@ -709,14 +762,15 @@
       options.forEach(function(opt) {
         var btn = document.createElement("button");
         btn.className = "option-btn";
-        btn.textContent = opt.pinyin; // 純拼音！
+        btn.textContent = opt.pinyin;
         btn.onclick = function() { selectOption(btn, opt, q); };
         box.appendChild(btn);
       });
     }
 
     function selectOption(selectedBtn, selectedOpt, correctOpt) {
-      document.querySelectorAll(".option-btn").forEach(function(b) { b.disabled = true; });
+      var allBtns = document.querySelectorAll(".option-btn");
+      allBtns.forEach(function(b) { b.disabled = true; });
       playAudio(selectedOpt.word);
 
       if (selectedOpt.id === correctOpt.id) {
@@ -725,7 +779,7 @@
         document.getElementById("quiz-score-tag").textContent = "得分：" + quizScore;
       } else {
         selectedBtn.classList.add("wrong");
-        document.querySelectorAll(".option-btn").forEach(function(b) {
+        allBtns.forEach(function(b) {
           if (b.textContent === correctOpt.pinyin) {
             b.classList.add("correct");
           }
@@ -745,7 +799,6 @@
       else showResult();
     }
 
-    // 結算畫面
     function showResult() {
       stopCurrentAudio();
       document.getElementById("quiz-card").classList.add("hidden");
