@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣英里留學・台灣華語 第二課 AI自主學習</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px;
+    }
+
+    /* 頂部英里留學橫幅 */
+    .brand-header {
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(135deg, #0d766e, #0f766e, #044e46);
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: white;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 14px rgba(15, 118, 110, 0.2);
+    }
+    .brand-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .badge-main {
+      background: #042f2c;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-sub {
+      background: #2dd4bf;
+      color: #042f2c;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #e6fffa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: #0f766e;
+    }
+
+    .view-section {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hidden { display: none !important; }
+
+    /* 1. 字卡模式 */
+    .counter {
+      font-weight: 700;
+      color: #0f766e;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+    .scene {
+      width: 100%;
+      height: 450px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 22px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .card.flipped {
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+    }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 22px;
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      text-align: center;
+    }
+    .front {
+      border-color: #99f6e4;
+      justify-content: space-between;
+    }
+    .img-container {
+      width: 100%;
+      height: 210px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .pinyin {
+      font-size: 1.35rem;
+      color: #0f766e;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .word {
+      font-size: 2.7rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: 1px;
+    }
+    .audio-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 24px;
+      background: #0f766e;
+      color: #ffffff;
+      border: none;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(15,118,110,0.25);
+    }
+    .back {
+      background: #fffaf5;
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+      border-color: #fed7aa;
+      justify-content: center;
+      gap: 16px;
+    }
+    .back-tag {
+      font-size: 0.8rem;
+      color: #9a3412;
+      background: #ffedd5;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+    .meaning {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #ea580c;
+    }
+    .example-box {
+      background: #ffffff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid #fed7aa;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+    }
+    .flip-hint { font-size: 0.78rem; color: #94a3b8; }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      width: 100%;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+    }
+    .btn:hover { background: #f8fafc; }
+    .btn-shuffle { flex: 0 0 50px; font-size: 1.1rem; }
+
+    /* 2. 測驗模式 (完全無漢字) */
+    .quiz-card {
+      width: 100%;
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 8px 20px -4px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .quiz-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .quiz-img-container {
+      width: 100%;
+      height: 180px;
+      background: #f8fafc;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .quiz-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .quiz-audio-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      background: #f0fdfa;
+      color: #0f766e;
+      border: 1.5px solid #99f6e4;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+    .quiz-meaning {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ea580c;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .option-btn {
+      width: 100%;
+      padding: 13px 18px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 14px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #e2e8f0;
+    }
+    .option-btn.correct {
+      background: #dcfce7 !important;
+      border-color: #22c55e !important;
+      color: #15803d !important;
+    }
+    .option-btn.wrong {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #b91c1c !important;
+    }
+    .next-quiz-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      background: #0f766e;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+    }
+
+    /* 3. 截圖專用：成績單結算畫面 */
+    .result-sheet-container {
+      width: 100%;
+      border: 2px dashed #f472b6;
+      border-radius: 20px;
+      padding: 18px 14px;
+      background: #ffffff;
+      margin-bottom: 16px;
+    }
+    .sheet-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .sheet-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+    .shoot-tag {
+      background: #ffe4e6;
+      color: #e11d48;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .name-input-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #475569;
+    }
+    .name-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      width: 100%;
+    }
+    .attempt-tag {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .score-summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 10px 4px;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 14px;
+    }
+    .score-left, .score-right {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #334155;
+    }
+    .num-red { color: #e11d48; font-weight: 800; }
+    .points-big {
+      font-size: 1.6rem;
+      color: #e11d48;
+      font-weight: 900;
+      margin-left: 2px;
+      margin-right: 2px;
+    }
+
+    .mistake-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .mistake-title { font-size: 0.85rem; font-weight: 800; color: #e11d48; }
+    .mistake-sub { font-size: 0.72rem; color: #94a3b8; }
+    .mistake-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .mistake-card {
+      background: #fff1f2;
+      border: 1px solid #ffe4e6;
+      border-radius: 12px;
+      padding: 10px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .mistake-q { color: #e11d48; font-size: 0.8rem; font-weight: 800; }
+    .mistake-word { font-size: 1.05rem; font-weight: 800; color: #0f172a; }
+    .mistake-meaning { font-size: 0.78rem; color: #64748b; margin-left: auto; }
+    .all-correct-box {
+      grid-column: span 2;
+      text-align: center;
+      padding: 24px 10px;
+      color: #059669;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .result-action-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+    .btn-retest {
+      flex: 1.3;
+      padding: 13px;
+      background: #e11d48;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-back-card {
+      flex: 1;
+      padding: 13px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="tts-audio-player" preload="none" referrerpolicy="no-referrer"></audio>
+
+  <div class="brand-header">
+    <div class="brand-badges">
+      <span class="badge-main">台灣英里留學</span>
+      <span class="badge-sub">台湾華語 第二課 AI自主学習</span>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-study-btn" onclick="switchTab('study')">🗂️ 単語カード</button>
+      <button class="tab-btn" id="tab-quiz-btn" onclick="switchTab('quiz')">🎧 リスニング</button>
+    </div>
+  </div>
+
+  <!-- 1. 字卡模式 -->
+  <div class="view-section" id="study-view">
+    <div class="counter" id="counter">1 / 22</div>
+    <div class="scene" onclick="flipCard()">
+      <div class="card" id="card">
+        <div class="card-face front">
+          <div class="img-container">
+            <img id="card-img" src="" alt="插畫">
+          </div>
+          <div class="pinyin" id="pinyin"></div>
+          <div class="word" id="word"></div>
+          <button class="audio-btn" onclick="handleCardAudio(event)">
+            🔊 聽發音
+          </button>
+          <span class="flip-hint">點擊卡片看背面提示 ↻</span>
+        </div>
+
+        <div class="card-face back">
+          <span class="back-tag">提示・日本語</span>
+          <div class="meaning" id="meaning"></div>
+          <div class="example-box" id="example" onclick="handleExampleAudio(event)"></div>
+          <span class="flip-hint">點擊卡片翻回正面 ↻</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" onclick="prevCard()">上一張</button>
+      <button class="btn btn-shuffle" title="隨機打亂" onclick="shuffleCards()">🔀</button>
+      <button class="btn" onclick="nextCard()">下一張</button>
+    </div>
+  </div>
+
+  <!-- 2. 測驗模式 (進行中) -->
+  <div class="view-section hidden" id="quiz-view">
+    <div class="quiz-card" id="quiz-card">
+      <div class="quiz-header">
+        <span id="quiz-progress">第 1 / 22 題</span>
+        <span id="quiz-score-tag">得分：0</span>
+      </div>
+
+      <div class="quiz-img-container">
+        <img id="quiz-img" src="" alt="測驗插圖">
+      </div>
+
+      <button class="quiz-audio-trigger" onclick="playCurrentQuizAudio()">
+        🔊 播放發音
+      </button>
+
+      <div class="quiz-meaning" id="quiz-prompt"></div>
+      <div class="options-grid" id="options-box"></div>
+      <button class="next-quiz-btn" id="next-quiz-btn" onclick="nextQuestion()">下一題 ➔</button>
+    </div>
+
+    <!-- 3. 成績單畫面 (完全依截圖打造) -->
+    <div class="view-section hidden" id="result-view">
+      <div class="result-sheet-container">
+        <div class="sheet-top">
+          <span class="sheet-title">台灣英里留學・台湾華語 第二課 AI自主学習</span>
+          <span class="shoot-tag">📷 撮影エリア</span>
+        </div>
+
+        <div class="name-row">
+          <div class="name-input-box">
+            <span>お名前:</span>
+            <input type="text" class="name-input" id="student-name" value="葛野心" onchange="saveStudentName(this.value)">
+          </div>
+          <span class="attempt-tag" id="attempt-badge">第 1 回目（※自主練習）</span>
+        </div>
+
+        <div class="score-summary-row">
+          <div class="score-left">
+            正解: <span class="num-red" id="res-correct-count">19</span> / 22 問 (<span id="res-wrong-count" class="num-red">3</span> 問不正解)
+          </div>
+          <div class="score-right">
+            得点: <span class="points-big" id="res-points">86</span> 点
+          </div>
+        </div>
+
+        <div class="mistake-section-header">
+          <span class="mistake-title">✖ 間違えた問題（復習対象）</span>
+          <span class="mistake-sub">※漢字と意味のみ表示</span>
+        </div>
+        <div class="mistake-grid" id="mistake-grid"></div>
+      </div>
+
+      <div class="result-action-row">
+        <button class="btn-retest" onclick="startQuiz()">↺ もう一度テストを受ける（練習用）</button>
+        <button class="btn-back-card" onclick="switchTab('study')">単語カードに戻る</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 專屬對應您 GitHub 倉庫中最外層的 22 張真實圖片名稱！
+    var data = [
+      { id: 1, pinyin: "chī fàn", word: "吃飯", file: "PPT_01_吃飯.png", meaning: "ご飯を食べる", example: "例句：我吃飯。" },
+      { id: 2, pinyin: "kàn shū", word: "看書", file: "PPT_02_看書.png", meaning: "本を読む", example: "例句：他看書。" },
+      { id: 3, pinyin: "shuì jiào", word: "睡覺", file: "PPT_03_睡覺.png", meaning: "寝る", example: "例句：我去睡覺。" },
+      { id: 4, pinyin: "zuò fàn", word: "做飯", file: "PPT_04_做飯.png", meaning: "料理をする", example: "例句：媽媽做飯。" },
+      { id: 5, pinyin: "mǎi cài", word: "買菜", file: "PPT_05_買菜.png", meaning: "野菜を買う", example: "例句：我去買菜。" },
+      { id: 6, pinyin: "kāi dēng", word: "開燈", file: "PPT_06_開燈.png", meaning: "電気をつける", example: "例句：請開燈。" },
+      { id: 7, pinyin: "dǎ sǎo", word: "打掃", file: "PPT_07_打掃.png", meaning: "掃除する", example: "例句：他打掃。" },
+      { id: 8, pinyin: "xǐ yī fu", word: "洗衣服", file: "PPT_08_洗衣服.png", meaning: "洗濯する", example: "例句：我洗衣服。" },
+      { id: 9, pinyin: "zhōu mò", word: "週末", file: "PPT_09_週末.png", meaning: "週末", example: "例句：今天是週末。" },
+      { id: 10, pinyin: "xiū xi", word: "休息", file: "PPT_10_休息.png", meaning: "休む", example: "例句：我要休息。" },
+      { id: 11, pinyin: "mǎi dōng xi", word: "買東西", file: "PPT_11_買東西.png", meaning: "買い物をする", example: "例句：去買東西。" },
+      { id: 12, pinyin: "chāo shì", word: "超市", file: "PPT_12_超市.png", meaning: "スーパー", example: "例句：我去超市。" },
+      { id: 13, pinyin: "zǎo ān", word: "早安", file: "PPT_13_早安.png", meaning: "おはよう", example: "例句：老師，早安！" },
+      { id: 14, pinyin: "yú", word: "魚", file: "PPT_14_魚.png", meaning: "魚", example: "例句：我吃魚。" },
+      { id: 15, pinyin: "péng you", word: "朋友", file: "PPT_15_朋友.png", meaning: "友達", example: "例句：他是我的朋友。" },
+      { id: 16, pinyin: "zhū", word: "豬", file: "PPT_16_豬.png", meaning: "豚", example: "例句：那是豬。" },
+      { id: 17, pinyin: "píng guǒ", word: "蘋果", file: "PPT_17_蘋果.png", meaning: "りんご", example: "例句：我買蘋果。" },
+      { id: 18, pinyin: "zhōng wǔ", word: "中午", file: "PPT_18_中午.png", meaning: "昼、正午", example: "例句：中午吃飯。" },
+      { id: 19, pinyin: "zǎo shang", word: "早上", meaning: "朝", file: "PPT_19_早上.png", example: "例句：早上好。" },
+      { id: 20, pinyin: "jīn tiān", word: "今天", meaning: "今日", file: "PPT_20_今天.png", example: "例句：今天是週末。" },
+      { id: 21, pinyin: "míng tiān", word: "明天", meaning: "明日", file: "PPT_21_明天.png", example: "例句：明天去超市。" },
+      { id: 22, pinyin: "xià wǔ", word: "下午", meaning: "午後", file: "PPT_22_下午.png", example: "例句：下午看書。" }
+    ];
+
+    var current = 0;
+    var cardEl = document.getElementById("card");
+    var attemptCount = parseInt(localStorage.getItem("eiri_quiz_attempts") || "1", 10);
+
+    var savedName = localStorage.getItem("eiri_student_name");
+    if (savedName) document.getElementById("student-name").value = savedName;
+    function saveStudentName(val) { localStorage.setItem("eiri_student_name", val); }
+
+    // 真人自然發音（無機械音、防雙重疊音）
+    function playAudio(text) {
+      if (!text) return;
+      var clean = text.replace(/例句：|。|！|？|,|\./g, '').trim();
+      stopCurrentAudio();
+      var player = document.getElementById("tts-audio-player");
+      player.src = "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=zh-TW&q=" + encodeURIComponent(clean);
+      var p = player.play();
+      if (p !== undefined) {
+        p.catch(function() {
+          if (window.speechSynthesis) {
+            var utter = new SpeechSynthesisUtterance(clean);
+            utter.lang = "zh-TW";
+            utter.rate = 0.85;
+            window.speechSynthesis.speak(utter);
+          }
+        });
+      }
+    }
+
+    function stopCurrentAudio() {
+      var player = document.getElementById("tts-audio-player");
+      if (player) { player.pause(); player.currentTime = 0; }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+
+    function handleCardAudio(e) { if (e) e.stopPropagation(); playAudio(data[current].word); }
+    function handleExampleAudio(e) { if (e) e.stopPropagation(); playAudio(data[current].example); }
+
+    // 直接抓取與 index.html 放在同目錄的 PPT_XX_單字.png
+    function displayImage(item, imgElement) {
+      imgElement.src = item.file;
+    }
+
+    function renderCard() {
+      var item = data[current];
+      displayImage(item, document.getElementById("card-img"));
+      document.getElementById("pinyin").textContent = item.pinyin;
+      document.getElementById("word").textContent = item.word;
+      document.getElementById("meaning").textContent = item.meaning;
+      document.getElementById("example").textContent = item.example + " 🔊";
+      document.getElementById("counter").textContent = (current + 1) + " / " + data.length;
+      cardEl.classList.remove("flipped");
+    }
+
+    function flipCard() { cardEl.classList.toggle("flipped"); }
+    function nextCard() { current = (current + 1) % data.length; renderCard(); }
+    function prevCard() { current = (current - 1 + data.length) % data.length; renderCard(); }
+    function shuffleCards() { data.sort(function() { return Math.random() - 0.5; }); current = 0; renderCard(); }
+
+    // 測驗邏輯
+    var quizList = [], quizIndex = 0, quizScore = 0;
+    var wrongList = [];
+
+    function startQuiz() {
+      stopCurrentAudio();
+      quizList = data.slice().sort(function() { return Math.random() - 0.5; });
+      quizIndex = 0;
+      quizScore = 0;
+      wrongList = [];
+      document.getElementById("quiz-card").classList.remove("hidden");
+      document.getElementById("result-view").classList.add("hidden");
+      renderQuestion();
+    }
+
+    function playCurrentQuizAudio() {
+      if (quizList[quizIndex]) playAudio(quizList[quizIndex].word);
+    }
+
+    function renderQuestion() {
+      var q = quizList[quizIndex];
+      document.getElementById("quiz-progress").textContent = "第 " + (quizIndex + 1) + " / " + quizList.length + " 題";
+      document.getElementById("quiz-score-tag").textContent = "得分：" + quizScore;
+      displayImage(q, document.getElementById("quiz-img"));
+      document.getElementById("quiz-prompt").textContent = q.meaning;
+      document.getElementById("next-quiz-btn").style.display = "none";
+      playAudio(q.word);
+
+      var distractors = data.filter(function(d) { return d.id !== q.id; })
+                            .sort(function() { return Math.random() - 0.5; })
+                            .slice(0, 3);
+      var options = [q].concat(distractors).sort(function() { return Math.random() - 0.5; });
+
+      var box = document.getElementById("options-box");
+      box.innerHTML = "";
+      options.forEach(function(opt) {
+        var btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.pinyin; // 純拼音！
+        btn.onclick = function() { selectOption(btn, opt, q); };
+        box.appendChild(btn);
+      });
+    }
+
+    function selectOption(selectedBtn, selectedOpt, correctOpt) {
+      document.querySelectorAll(".option-btn").forEach(function(b) { b.disabled = true; });
+      playAudio(selectedOpt.word);
+
+      if (selectedOpt.id === correctOpt.id) {
+        selectedBtn.classList.add("correct");
+        quizScore += 1;
+        document.getElementById("quiz-score-tag").textContent = "得分：" + quizScore;
+      } else {
+        selectedBtn.classList.add("wrong");
+        document.querySelectorAll(".option-btn").forEach(function(b) {
+          if (b.textContent === correctOpt.pinyin) {
+            b.classList.add("correct");
+          }
+        });
+        wrongList.push({
+          qNum: quizIndex + 1,
+          word: correctOpt.word,
+          meaning: correctOpt.meaning
+        });
+      }
+      document.getElementById("next-quiz-btn").style.display = "block";
+    }
+
+    function nextQuestion() {
+      quizIndex++;
+      if (quizIndex < quizList.length) renderQuestion();
+      else showResult();
+    }
+
+    // 結算畫面（完全依截圖打造）
+    function showResult() {
+      stopCurrentAudio();
+      document.getElementById("quiz-card").classList.add("hidden");
+      document.getElementById("result-view").classList.remove("hidden");
+
+      document.getElementById("attempt-badge").textContent = "第 " + attemptCount + " 回目（※自主練習）";
+      attemptCount++;
+      localStorage.setItem("eiri_quiz_attempts", attemptCount.toString());
+
+      var total = quizList.length;
+      var wrongCount = total - quizScore;
+      var points = Math.round((quizScore / total) * 100);
+
+      document.getElementById("res-correct-count").textContent = quizScore;
+      document.getElementById("res-wrong-count").textContent = wrongCount;
+      document.getElementById("res-points").textContent = points;
+
+      var grid = document.getElementById("mistake-grid");
+      grid.innerHTML = "";
+
+      if (wrongList.length === 0) {
+        grid.innerHTML = '<div class="all-correct-box">🎉 全問正解！素晴らしい！パーフェクトです！</div>';
+      } else {
+        wrongList.forEach(function(item) {
+          var card = document.createElement("div");
+          card.className = "mistake-card";
+          card.onclick = function() { playAudio(item.word); };
+          card.innerHTML = '<span class="mistake-q">Q' + item.qNum + '</span> ' +
+                           '<span class="mistake-word">' + item.word + '</span> ' +
+                           '<span class="mistake-meaning">(' + item.meaning + ')</span>';
+          grid.appendChild(card);
+        });
+      }
+    }
+
+    function switchTab(mode) {
+      stopCurrentAudio();
+      var studyView = document.getElementById("study-view");
+      var quizView = document.getElementById("quiz-view");
+      var btnStudy = document.getElementById("tab-study-btn");
+      var btnQuiz = document.getElementById("tab-quiz-btn");
+
+      if (mode === "study") {
+        studyView.classList.remove("hidden");
+        quizView.classList.add("hidden");
+        btnStudy.classList.add("active");
+        btnQuiz.classList.remove("active");
+      } else {
+        studyView.classList.add("hidden");
+        quizView.classList.remove("hidden");
+        btnQuiz.classList.add("active");
+        btnStudy.classList.remove("active");
+        startQuiz();
+      }
+    }
+
+    renderCard();
+  </script>
+</body>
+</html>
